@@ -12,6 +12,9 @@ when someGcc:
   {.passC: "-msse".}
   {.passL: "-msse".}
 
+# MSVC does not support MMX on 64 bits target
+const vcc64Bits = defined(vcc) and defined(x86_64)
+
 import x86_mmx
 type m128* {.importc: "__m128", header: "xmmintrin.h".} = object
 
@@ -255,14 +258,6 @@ proc cvt_ss2si*(a: m128): int32
   {.importc: "_mm_cvt_ss2si", header: "xmmintrin.h".}
   ## Exposes _mm_cvt_ss2si intrinsics
 
-proc cvtps_pi32*(a: m128): m64
-  {.importc: "_mm_cvtps_pi32", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtps_pi32 intrinsics
-
-proc cvt_ps2pi*(a: m128): m64
-  {.importc: "_mm_cvt_ps2pi", header: "xmmintrin.h".}
-  ## Exposes _mm_cvt_ps2pi intrinsics
-
 proc cvttss_si32*(a: m128): int32
   {.importc: "_mm_cvttss_si32", header: "xmmintrin.h".}
   ## Exposes _mm_cvttss_si32 intrinsics
@@ -271,13 +266,126 @@ proc cvtt_ss2si*(a: m128): int32
   {.importc: "_mm_cvtt_ss2si", header: "xmmintrin.h".}
   ## Exposes _mm_cvtt_ss2si intrinsics
 
-proc cvttps_pi32*(a: m128): m64
-  {.importc: "_mm_cvttps_pi32", header: "xmmintrin.h".}
-  ## Exposes _mm_cvttps_pi32 intrinsics
+when not vcc64Bits:
+  proc cvtps_pi32*(a: m128): m64
+    {.importc: "_mm_cvtps_pi32", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtps_pi32 intrinsics
 
-proc cvtt_ps2pi*(a: m128): m64
-  {.importc: "_mm_cvtt_ps2pi", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtt_ps2pi intrinsics
+  proc cvt_ps2pi*(a: m128): m64
+    {.importc: "_mm_cvt_ps2pi", header: "xmmintrin.h".}
+    ## Exposes _mm_cvt_ps2pi intrinsics
+
+  proc cvttps_pi32*(a: m128): m64
+    {.importc: "_mm_cvttps_pi32", header: "xmmintrin.h".}
+    ## Exposes _mm_cvttps_pi32 intrinsics
+
+  proc cvtt_ps2pi*(a: m128): m64
+    {.importc: "_mm_cvtt_ps2pi", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtt_ps2pi intrinsics
+
+  proc stream_pi*(p: ptr m64, a: m64): void
+    {.importc: "_mm_stream_pi", header: "xmmintrin.h".}
+    ## Exposes _mm_stream_pi intrinsics
+
+  proc cvtpi16_ps*(a: m64): m128
+    {.importc: "_mm_cvtpi16_ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtpi16_ps intrinsics
+
+  proc cvtpu16_ps*(a: m64): m128
+    {.importc: "_mm_cvtpu16_ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtpu16_ps intrinsics
+
+  proc cvtpi8_ps*(a: m64): m128
+    {.importc: "_mm_cvtpi8_ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtpi8_ps intrinsics
+
+  proc cvtpu8_ps*(a: m64): m128
+    {.importc: "_mm_cvtpu8_ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtpu8_ps intrinsics
+
+  proc cvtpi32x2_ps*(a: m64, b: m64): m128
+    {.importc: "_mm_cvtpi32x2_ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtpi32x2_ps intrinsics
+
+  proc cvtps_pi16*(a: m128): m64
+    {.importc: "_mm_cvtps_pi16", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtps_pi16 intrinsics
+
+  proc cvtps_pi8*(a: m128): m64
+    {.importc: "_mm_cvtps_pi8", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtps_pi8 intrinsics
+
+  proc cvtpi32_ps*(a: m128, b: m64): m128
+    {.importc: "_mm_cvtpi32_ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvtpi32_ps intrinsics
+
+  proc cvt_pi2ps*(a: m128, b: m64): m128
+    {.importc: "_mm_cvt_pi2ps", header: "xmmintrin.h".}
+    ## Exposes _mm_cvt_pi2ps intrinsics
+
+  proc loadh_pi*(a: m128,  p: ptr m64): m128
+    {.importc: "_mm_loadh_pi", header: "xmmintrin.h".}
+    ## Exposes _mm_loadh_pi intrinsics
+
+  proc loadl_pi*(a: m128,  p: ptr m64): m128
+    {.importc: "_mm_loadl_pi", header: "xmmintrin.h".}
+    ## Exposes _mm_loadl_pi intrinsics
+
+  proc storeh_pi*(p: ptr m64, a: m128): void
+    {.importc: "_mm_storeh_pi", header: "xmmintrin.h".}
+    ## Exposes _mm_storeh_pi intrinsics
+
+  proc storel_pi*(p: ptr m64, a: m128): void
+    {.importc: "_mm_storel_pi", header: "xmmintrin.h".}
+    ## Exposes _mm_storel_pi intrinsics
+
+  proc extract_pi16*(a: m64, n: int32): int32
+    {.importc: "_mm_extract_pi16", header: "xmmintrin.h".}
+    ## Exposes _mm_extract_pi16 intrinsics
+
+  proc insert_pi16*(a: m64, d: int32, n: int32): m64
+    {.importc: "_mm_insert_pi16", header: "xmmintrin.h".}
+    ## Exposes _mm_insert_pi16 intrinsics
+
+  proc max_pi16*(a: m64, b: m64): m64
+    {.importc: "_mm_max_pi16", header: "xmmintrin.h".}
+    ## Exposes _mm_max_pi16 intrinsics
+
+  proc max_pu8*(a: m64, b: m64): m64
+    {.importc: "_mm_max_pu8", header: "xmmintrin.h".}
+    ## Exposes _mm_max_pu8 intrinsics
+
+  proc min_pi16*(a: m64, b: m64): m64
+    {.importc: "_mm_min_pi16", header: "xmmintrin.h".}
+    ## Exposes _mm_min_pi16 intrinsics
+
+  proc min_pu8*(a: m64, b: m64): m64
+    {.importc: "_mm_min_pu8", header: "xmmintrin.h".}
+    ## Exposes _mm_min_pu8 intrinsics
+
+  proc movemask_pi8*(a: m64): int32
+    {.importc: "_mm_movemask_pi8", header: "xmmintrin.h".}
+    ## Exposes _mm_movemask_pi8 intrinsics
+
+  proc mulhi_pu16*(a: m64, b: m64): m64
+    {.importc: "_mm_mulhi_pu16", header: "xmmintrin.h".}
+    ## Exposes _mm_mulhi_pu16 intrinsics
+
+  proc maskmove_si64*(d: m64, n: m64, p: ptr int8): void
+    {.importc: "_mm_maskmove_si64", header: "xmmintrin.h".}
+    ## Exposes _mm_maskmove_si64 intrinsics
+
+  proc avg_pu8*(a: m64, b: m64): m64
+    {.importc: "_mm_avg_pu8", header: "xmmintrin.h".}
+    ## Exposes _mm_avg_pu8 intrinsics
+
+  proc avg_pu16*(a: m64, b: m64): m64
+    {.importc: "_mm_avg_pu16", header: "xmmintrin.h".}
+    ## Exposes _mm_avg_pu16 intrinsics
+
+  proc sad_pu8*(a: m64, b: m64): m64
+    {.importc: "_mm_sad_pu8", header: "xmmintrin.h".}
+    ## Exposes _mm_sad_pu8 intrinsics
 
 proc cvtsi32_ss*(a: m128, b: int32): m128
   {.importc: "_mm_cvtsi32_ss", header: "xmmintrin.h".}
@@ -292,25 +400,9 @@ when defined(x86_64):
     {.importc: "_mm_cvtsi64_ss", header: "xmmintrin.h".}
     ## Exposes _mm_cvtsi64_ss intrinsics
 
-proc cvtpi32_ps*(a: m128, b: m64): m128
-  {.importc: "_mm_cvtpi32_ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtpi32_ps intrinsics
-
-proc cvt_pi2ps*(a: m128, b: m64): m128
-  {.importc: "_mm_cvt_pi2ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvt_pi2ps intrinsics
-
 proc cvtss_f32*(a: m128): float32
   {.importc: "_mm_cvtss_f32", header: "xmmintrin.h".}
   ## Exposes _mm_cvtss_f32 intrinsics
-
-proc loadh_pi*(a: m128,  p: ptr m64): m128
-  {.importc: "_mm_loadh_pi", header: "xmmintrin.h".}
-  ## Exposes _mm_loadh_pi intrinsics
-
-proc loadl_pi*(a: m128,  p: ptr m64): m128
-  {.importc: "_mm_loadl_pi", header: "xmmintrin.h".}
-  ## Exposes _mm_loadl_pi intrinsics
 
 proc load_ss*( p: ptr float32): m128
   {.importc: "_mm_load_ss", header: "xmmintrin.h".}
@@ -356,14 +448,6 @@ proc setzero_ps*(): m128
   {.importc: "_mm_setzero_ps", header: "xmmintrin.h".}
   ## Exposes _mm_setzero_ps intrinsics
 
-proc storeh_pi*(p: ptr m64, a: m128): void
-  {.importc: "_mm_storeh_pi", header: "xmmintrin.h".}
-  ## Exposes _mm_storeh_pi intrinsics
-
-proc storel_pi*(p: ptr m64, a: m128): void
-  {.importc: "_mm_storel_pi", header: "xmmintrin.h".}
-  ## Exposes _mm_storel_pi intrinsics
-
 proc store_ss*(p: ptr float32, a: m128): void
   {.importc: "_mm_store_ss", header: "xmmintrin.h".}
   ## Exposes _mm_store_ss intrinsics
@@ -388,10 +472,6 @@ proc storer_ps*(p: ptr float32, a: m128): void
   {.importc: "_mm_storer_ps", header: "xmmintrin.h".}
   ## Exposes _mm_storer_ps intrinsics
 
-proc stream_pi*(p: ptr m64, a: m64): void
-  {.importc: "_mm_stream_pi", header: "xmmintrin.h".}
-  ## Exposes _mm_stream_pi intrinsics
-
 proc stream_ps*(p: ptr float32, a: m128): void
   {.importc: "_mm_stream_ps", header: "xmmintrin.h".}
   ## Exposes _mm_stream_ps intrinsics
@@ -399,54 +479,6 @@ proc stream_ps*(p: ptr float32, a: m128): void
 proc sfence*(): void
   {.importc: "_mm_sfence", header: "xmmintrin.h".}
   ## Exposes _mm_sfence intrinsics
-
-proc extract_pi16*(a: m64, n: int32): int32
-  {.importc: "_mm_extract_pi16", header: "xmmintrin.h".}
-  ## Exposes _mm_extract_pi16 intrinsics
-
-proc insert_pi16*(a: m64, d: int32, n: int32): m64
-  {.importc: "_mm_insert_pi16", header: "xmmintrin.h".}
-  ## Exposes _mm_insert_pi16 intrinsics
-
-proc max_pi16*(a: m64, b: m64): m64
-  {.importc: "_mm_max_pi16", header: "xmmintrin.h".}
-  ## Exposes _mm_max_pi16 intrinsics
-
-proc max_pu8*(a: m64, b: m64): m64
-  {.importc: "_mm_max_pu8", header: "xmmintrin.h".}
-  ## Exposes _mm_max_pu8 intrinsics
-
-proc min_pi16*(a: m64, b: m64): m64
-  {.importc: "_mm_min_pi16", header: "xmmintrin.h".}
-  ## Exposes _mm_min_pi16 intrinsics
-
-proc min_pu8*(a: m64, b: m64): m64
-  {.importc: "_mm_min_pu8", header: "xmmintrin.h".}
-  ## Exposes _mm_min_pu8 intrinsics
-
-proc movemask_pi8*(a: m64): int32
-  {.importc: "_mm_movemask_pi8", header: "xmmintrin.h".}
-  ## Exposes _mm_movemask_pi8 intrinsics
-
-proc mulhi_pu16*(a: m64, b: m64): m64
-  {.importc: "_mm_mulhi_pu16", header: "xmmintrin.h".}
-  ## Exposes _mm_mulhi_pu16 intrinsics
-
-proc maskmove_si64*(d: m64, n: m64, p: ptr int8): void
-  {.importc: "_mm_maskmove_si64", header: "xmmintrin.h".}
-  ## Exposes _mm_maskmove_si64 intrinsics
-
-proc avg_pu8*(a: m64, b: m64): m64
-  {.importc: "_mm_avg_pu8", header: "xmmintrin.h".}
-  ## Exposes _mm_avg_pu8 intrinsics
-
-proc avg_pu16*(a: m64, b: m64): m64
-  {.importc: "_mm_avg_pu16", header: "xmmintrin.h".}
-  ## Exposes _mm_avg_pu16 intrinsics
-
-proc sad_pu8*(a: m64, b: m64): m64
-  {.importc: "_mm_sad_pu8", header: "xmmintrin.h".}
-  ## Exposes _mm_sad_pu8 intrinsics
 
 proc getcsr*(): int32
   {.importc: "_mm_getcsr", header: "xmmintrin.h".}
@@ -475,34 +507,6 @@ proc movehl_ps*(a: m128, b: m128): m128
 proc movelh_ps*(a: m128, b: m128): m128
   {.importc: "_mm_movelh_ps", header: "xmmintrin.h".}
   ## Exposes _mm_movelh_ps intrinsics
-
-proc cvtpi16_ps*(a: m64): m128
-  {.importc: "_mm_cvtpi16_ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtpi16_ps intrinsics
-
-proc cvtpu16_ps*(a: m64): m128
-  {.importc: "_mm_cvtpu16_ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtpu16_ps intrinsics
-
-proc cvtpi8_ps*(a: m64): m128
-  {.importc: "_mm_cvtpi8_ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtpi8_ps intrinsics
-
-proc cvtpu8_ps*(a: m64): m128
-  {.importc: "_mm_cvtpu8_ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtpu8_ps intrinsics
-
-proc cvtpi32x2_ps*(a: m64, b: m64): m128
-  {.importc: "_mm_cvtpi32x2_ps", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtpi32x2_ps intrinsics
-
-proc cvtps_pi16*(a: m128): m64
-  {.importc: "_mm_cvtps_pi16", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtps_pi16 intrinsics
-
-proc cvtps_pi8*(a: m128): m64
-  {.importc: "_mm_cvtps_pi8", header: "xmmintrin.h".}
-  ## Exposes _mm_cvtps_pi8 intrinsics
 
 proc movemask_ps*(a: m128): int32
   {.importc: "_mm_movemask_ps", header: "xmmintrin.h".}
@@ -561,18 +565,48 @@ proc set_rounding_mode*(x: int32) {.inline.} =
 when isMainModule:
   var myint32 : int32 = 1;
   var mym128 = set1_ps(1.0)
-  var mym64 = set1_pi32(1)
   var myfloat32 : float32 = 1.0
   var argint8 : int8 = 1;
   var argm128 = set1_ps(1.0)
-  var argm64 = set1_pi32(1)
-  var argm640 = set1_pi32(2)
   when defined(x86_64):
     var argint64 : int64 = 1
   var argfloat32 : float32 = 1.0
   var argptrint8 = addr(argint8)
   var argptrfloat32 : ptr float32 = cast[ptr float32](addr(argm128))
-  var argptrm64 = addr(argm640)
+  when not vcc64Bits:
+    var mym64 = set1_pi32(1)
+    var argm64 = set1_pi32(1)
+    var argptrm64 = addr(argm64)
+    mym64 = cvtps_pi32(argm128)
+    mym64 = cvt_ps2pi(argm128)
+    mym64 = cvttps_pi32(argm128)
+    mym64 = cvtt_ps2pi(argm128)
+    mym128 = cvtpi32_ps(argm128, argm64)
+    mym128 = cvt_pi2ps(argm128, argm64)
+    mym128 = loadh_pi(argm128,  argptrm64)
+    mym128 = loadl_pi(argm128,  argptrm64)
+    storeh_pi(argptrm64, argm128)
+    storel_pi(argptrm64, argm128)
+    myint32 = extract_pi16(argm64, 1)
+    mym64 = insert_pi16(argm64, 1, 1)
+    mym64 = max_pi16(argm64, argm64)
+    mym64 = max_pu8(argm64, argm64)
+    mym64 = min_pi16(argm64, argm64)
+    mym64 = min_pu8(argm64, argm64)
+    myint32 = movemask_pi8(argm64)
+    mym64 = mulhi_pu16(argm64, argm64)
+    maskmove_si64(argm64, argm64, argptrint8)
+    mym64 = avg_pu8(argm64, argm64)
+    mym64 = avg_pu16(argm64, argm64)
+    mym64 = sad_pu8(argm64, argm64)
+    stream_pi(argptrm64, argm64)
+    mym128 = cvtpi16_ps(argm64)
+    mym128 = cvtpu16_ps(argm64)
+    mym128 = cvtpi8_ps(argm64)
+    mym128 = cvtpu8_ps(argm64)
+    mym128 = cvtpi32x2_ps(argm64, argm64)
+    mym64 = cvtps_pi16(argm128)
+    mym64 = cvtps_pi8(argm128)
   mym128 = add_ss(argm128, argm128)
   mym128 = add_ps(argm128, argm128)
   mym128 = sub_ss(argm128, argm128)
@@ -633,21 +667,13 @@ when isMainModule:
   myint32 = ucomineq_ss(argm128, argm128)
   myint32 = cvtss_si32(argm128)
   myint32 = cvt_ss2si(argm128)
-  mym64 = cvtps_pi32(argm128)
-  mym64 = cvt_ps2pi(argm128)
   myint32 = cvttss_si32(argm128)
   myint32 = cvtt_ss2si(argm128)
-  mym64 = cvttps_pi32(argm128)
-  mym64 = cvtt_ps2pi(argm128)
   mym128 = cvtsi32_ss(argm128, 1)
   mym128 = cvt_si2ss(argm128, 1)
   when defined(x86_64):
     mym128 = cvtsi64_ss(argm128, argint64)
-  mym128 = cvtpi32_ps(argm128, argm64)
-  mym128 = cvt_pi2ps(argm128, argm64)
   myfloat32 = cvtss_f32(argm128)
-  mym128 = loadh_pi(argm128,  argptrm64)
-  mym128 = loadl_pi(argm128,  argptrm64)
   mym128 = load_ss( argptrfloat32)
   mym128 = load1_ps( argptrfloat32)
   mym128 = load_ps( argptrfloat32)
@@ -659,29 +685,14 @@ when isMainModule:
   mym128 = set_ps(argfloat32, argfloat32, argfloat32, argfloat32)
   mym128 = setr_ps(argfloat32, argfloat32, argfloat32, argfloat32)
   mym128 = setzero_ps()
-  storeh_pi(argptrm64, argm128)
-  storel_pi(argptrm64, argm128)
   store_ss(argptrfloat32, argm128)
   storeu_ps(argptrfloat32, argm128)
   store1_ps(argptrfloat32, argm128)
   store_ps1(argptrfloat32, argm128)
   store_ps(argptrfloat32, argm128)
   storer_ps(argptrfloat32, argm128)
-  stream_pi(argptrm64, argm64)
   stream_ps(argptrfloat32, argm128)
   sfence()
-  myint32 = extract_pi16(argm64, 1)
-  mym64 = insert_pi16(argm64, 1, 1)
-  mym64 = max_pi16(argm64, argm64)
-  mym64 = max_pu8(argm64, argm64)
-  mym64 = min_pi16(argm64, argm64)
-  mym64 = min_pu8(argm64, argm64)
-  myint32 = movemask_pi8(argm64)
-  mym64 = mulhi_pu16(argm64, argm64)
-  maskmove_si64(argm64, argm64, argptrint8)
-  mym64 = avg_pu8(argm64, argm64)
-  mym64 = avg_pu16(argm64, argm64)
-  mym64 = sad_pu8(argm64, argm64)
   myint32 = getcsr()
   setcsr(1)
   mym128 = unpackhi_ps(argm128, argm128)
@@ -689,12 +700,5 @@ when isMainModule:
   mym128 = move_ss(argm128, argm128)
   mym128 = movehl_ps(argm128, argm128)
   mym128 = movelh_ps(argm128, argm128)
-  mym128 = cvtpi16_ps(argm64)
-  mym128 = cvtpu16_ps(argm64)
-  mym128 = cvtpi8_ps(argm64)
-  mym128 = cvtpu8_ps(argm64)
-  mym128 = cvtpi32x2_ps(argm64, argm64)
-  mym64 = cvtps_pi16(argm128)
-  mym64 = cvtps_pi8(argm128)
   myint32 = movemask_ps(argm128)
 

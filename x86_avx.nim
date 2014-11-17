@@ -168,31 +168,32 @@ proc blendv_ps*(a: m256, b: m256, c: m256): m256
   {.importc: "_mm256_blendv_ps", header: "immintrin.h".}
   ## Exposes _mm256_blendv_ps intrinsics
 
-proc extract_epi32*(a: m256i, imm: int32): int32
-  {.importc: "_mm256_extract_epi32", header: "immintrin.h".}
-  ## Exposes _mm256_extract_epi32 intrinsics
+when not defined(vcc):
+  proc extract_epi32*(a: m256i, imm: int32): int32
+    {.importc: "_mm256_extract_epi32", header: "immintrin.h".}
+    ## Exposes _mm256_extract_epi32 intrinsics
 
-proc extract_epi16*(a: m256i, imm: int32): int32
-  {.importc: "_mm256_extract_epi16", header: "immintrin.h".}
-  ## Exposes _mm256_extract_epi16 intrinsics
+  proc extract_epi16*(a: m256i, imm: int32): int32
+    {.importc: "_mm256_extract_epi16", header: "immintrin.h".}
+    ## Exposes _mm256_extract_epi16 intrinsics
 
-proc extract_epi8*(a: m256i, imm: int32): int32
-  {.importc: "_mm256_extract_epi8", header: "immintrin.h".}
-  ## Exposes _mm256_extract_epi8 intrinsics
+  proc extract_epi8*(a: m256i, imm: int32): int32
+    {.importc: "_mm256_extract_epi8", header: "immintrin.h".}
+    ## Exposes _mm256_extract_epi8 intrinsics
 
-proc insert_epi32*(a: m256i, b: int32, imm: int32): m256i
-  {.importc: "_mm256_insert_epi32", header: "immintrin.h".}
-  ## Exposes _mm256_insert_epi32 intrinsics
+  proc insert_epi32*(a: m256i, b: int32, imm: int32): m256i
+    {.importc: "_mm256_insert_epi32", header: "immintrin.h".}
+    ## Exposes _mm256_insert_epi32 intrinsics
 
-proc insert_epi16*(a: m256i, b: int32, imm: int32): m256i
-  {.importc: "_mm256_insert_epi16", header: "immintrin.h".}
-  ## Exposes _mm256_insert_epi16 intrinsics
+  proc insert_epi16*(a: m256i, b: int32, imm: int32): m256i
+    {.importc: "_mm256_insert_epi16", header: "immintrin.h".}
+    ## Exposes _mm256_insert_epi16 intrinsics
 
-proc insert_epi8*(a: m256i, b: int32, imm: int32): m256i
-  {.importc: "_mm256_insert_epi8", header: "immintrin.h".}
-  ## Exposes _mm256_insert_epi8 intrinsics
+  proc insert_epi8*(a: m256i, b: int32, imm: int32): m256i
+    {.importc: "_mm256_insert_epi8", header: "immintrin.h".}
+    ## Exposes _mm256_insert_epi8 intrinsic
 
-when defined(x86_64):
+when defined(x86_64) and defined(vcc):
   proc insert_epi64*(a: m256i, b: int32, imm: int32): m256i
     {.importc: "_mm256_insert_epi64", header: "immintrin.h".}
     ## Exposes _mm256_insert_epi64 intrinsics
@@ -469,9 +470,18 @@ proc set_epi8*(b31: int8, b30: int8, b29: int8, b28: int8, b27: int8, b26: int8,
   {.importc: "_mm256_set_epi8", header: "immintrin.h".}
   ## Exposes _mm256_set_epi8 intrinsics
 
-proc set_epi64x*(a: int64, b: int64, c: int64, d: int64): m256i
-  {.importc: "_mm256_set_epi64x", header: "immintrin.h".}
-  ## Exposes _mm256_set_epi64x intrinsics
+when defined(x86_64):
+  proc set_epi64x*(a: int64, b: int64, c: int64, d: int64): m256i
+    {.importc: "_mm256_set_epi64x", header: "immintrin.h".}
+    ## Exposes _mm256_set_epi64x intrinsics
+
+  proc setr_epi64x*(a: int64, b: int64, c: int64, d: int64): m256i
+    {.importc: "_mm256_setr_epi64x", header: "immintrin.h".}
+    ## Exposes _mm256_setr_epi64x intrinsics
+
+  proc set1_epi64x*(q: int64): m256i
+    {.importc: "_mm256_set1_epi64x", header: "immintrin.h".}
+    ## Exposes _mm256_set1_epi64x intrinsics
 
 proc setr_pd*(a: float64, b: float64, c: float64, d: float64): m256d
   {.importc: "_mm256_setr_pd", header: "immintrin.h".}
@@ -493,10 +503,6 @@ proc setr_epi8*(b31: int8, b30: int8, b29: int8, b28: int8, b27: int8, b26: int8
   {.importc: "_mm256_setr_epi8", header: "immintrin.h".}
   ## Exposes _mm256_setr_epi8 intrinsics
 
-proc setr_epi64x*(a: int64, b: int64, c: int64, d: int64): m256i
-  {.importc: "_mm256_setr_epi64x", header: "immintrin.h".}
-  ## Exposes _mm256_setr_epi64x intrinsics
-
 proc set1_pd_256*(w: float64): m256d
   {.importc: "_mm256_set1_pd", header: "immintrin.h".}
   ## Exposes _mm256_set1_pd intrinsics
@@ -516,10 +522,6 @@ proc set1_epi16*(w: int16): m256i
 proc set1_epi8*(b: int8): m256i
   {.importc: "_mm256_set1_epi8", header: "immintrin.h".}
   ## Exposes _mm256_set1_epi8 intrinsics
-
-proc set1_epi64x*(q: int64): m256i
-  {.importc: "_mm256_set1_epi64x", header: "immintrin.h".}
-  ## Exposes _mm256_set1_epi64x intrinsics
 
 proc setzero_pd*(): m256d
   {.importc: "_mm256_setzero_pd", header: "immintrin.h".}
@@ -781,13 +783,14 @@ when isMainModule:
   mym256 = permutevar_ps(argm256, argm256i)
   mym256d = blendv_pd(argm256d, argm256d, argm256d)
   mym256 = blendv_ps(argm256, argm256, argm256)
-  myint32 = extract_epi32(argm256i, 1)
-  myint32 = extract_epi16(argm256i, 1)
-  myint32 = extract_epi8(argm256i, 1)
-  mym256i = insert_epi32(argm256i, 1, 1)
-  mym256i = insert_epi16(argm256i, 1, 1)
-  mym256i = insert_epi8(argm256i, 1, 1)
-  when defined(x86_64):
+  when not defined(vcc):
+    myint32 = extract_epi32(argm256i, 1)
+    myint32 = extract_epi16(argm256i, 1)
+    myint32 = extract_epi8(argm256i, 1)
+    mym256i = insert_epi32(argm256i, 1, 1)
+    mym256i = insert_epi16(argm256i, 1, 1)
+    mym256i = insert_epi8(argm256i, 1, 1)
+  when defined(x86_64) and not defined(vcc):
     mym256i = insert_epi64(argm256i, 1, 1)
   mym256d = cvtepi32_pd(argm128i)
   mym256 = cvtepi32_ps(argm256i)
@@ -857,19 +860,20 @@ when isMainModule:
   mym256i = set_epi32(1, 1, 1, 1, 1, 1, 1, 1)
   mym256i = set_epi16(argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16)
   mym256i = set_epi8(argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8)
-  mym256i = set_epi64x(argint64, argint64, argint64, argint64)
+  when defined(x86_64):
+    mym256i = set_epi64x(argint64, argint64, argint64, argint64)
+    mym256i = setr_epi64x(argint64, argint64, argint64, argint64)
+    mym256i = set1_epi64x(argint64)
   mym256d = setr_pd(argfloat64, argfloat64, argfloat64, argfloat64)
   mym256 = setr_ps(argfloat32, argfloat32, argfloat32, argfloat32, argfloat32, argfloat32, argfloat32, argfloat32)
   mym256i = setr_epi32(1, 1, 1, 1, 1, 1, 1, 1)
   mym256i = setr_epi16(argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16)
   mym256i = setr_epi8(argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8)
-  mym256i = setr_epi64x(argint64, argint64, argint64, argint64)
   mym256d = set1_pd_256(argfloat64)
   mym256 = set1_ps_256(argfloat32)
   mym256i = set1_epi32_256(1)
   mym256i = set1_epi16(argint16)
   mym256i = set1_epi8(argint8)
-  mym256i = set1_epi64x(argint64)
   mym256d = setzero_pd()
   mym256 = setzero_ps()
   mym256i = setzero_si256()

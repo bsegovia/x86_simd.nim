@@ -243,9 +243,10 @@ proc extract_epi32*(a: m128i, b: int32): int32
   {.importc: "_mm_extract_epi32", header: "smmintrin.h".}
   ## Exposes _mm_extract_epi32 intrinsics
 
-proc extract_epi64*(a: m128i, b: int32): int32
-  {.importc: "_mm_extract_epi64", header: "smmintrin.h".}
-  ## Exposes _mm_extract_epi64 intrinsics
+when defined(x86_64):
+  proc extract_epi64*(a: m128i, b: int32): int32
+    {.importc: "_mm_extract_epi64", header: "smmintrin.h".}
+    ## Exposes _mm_extract_epi64 intrinsics
 
 proc mpsadbw_epu8*(a: m128i, b: m128i, c: int32): m128i
   {.importc: "_mm_mpsadbw_epu8", header: "smmintrin.h".}
@@ -334,6 +335,7 @@ when isMainModule:
     mym128i = insert_epi64(argm128i, 1, 1)
   myint32 = extract_epi8(argm128i, 1)
   myint32 = extract_epi32(argm128i, 1)
-  myint32 = extract_epi64(argm128i, 1)
+  when defined(x86_64):
+    myint32 = extract_epi64(argm128i, 1)
   mym128i = mpsadbw_epu8(argm128i, argm128i, 1)
 

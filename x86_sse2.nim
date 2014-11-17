@@ -12,6 +12,9 @@ when someGcc:
   {.passC: "-msse -msse2".}
   {.passL: "-msse -msse2".}
 
+# MSVC does not support MMX on 64 bits target
+const vcc64Bits = defined(vcc) and defined(x86_64)
+
 import x86_mmx
 import x86_sse
 type m128d* {.importc: "__m128d", header: "emmintrin.h".} = object
@@ -273,18 +276,6 @@ proc cvttsd_si32*(a: m128d): int32
   {.importc: "_mm_cvttsd_si32", header: "emmintrin.h".}
   ## Exposes _mm_cvttsd_si32 intrinsics
 
-proc cvtpd_pi32*(a: m128d): m64
-  {.importc: "_mm_cvtpd_pi32", header: "emmintrin.h".}
-  ## Exposes _mm_cvtpd_pi32 intrinsics
-
-proc cvttpd_pi32*(a: m128d): m64
-  {.importc: "_mm_cvttpd_pi32", header: "emmintrin.h".}
-  ## Exposes _mm_cvttpd_pi32 intrinsics
-
-proc cvtpi32_pd*(a: m64): m128d
-  {.importc: "_mm_cvtpi32_pd", header: "emmintrin.h".}
-  ## Exposes _mm_cvtpi32_pd intrinsics
-
 proc cvtsd_f64*(a: m128d): float64
   {.importc: "_mm_cvtsd_f64", header: "emmintrin.h".}
   ## Exposes _mm_cvtsd_f64 intrinsics
@@ -381,10 +372,6 @@ proc add_epi32*(a: m128i, b: m128i): m128i
   {.importc: "_mm_add_epi32", header: "emmintrin.h".}
   ## Exposes _mm_add_epi32 intrinsics
 
-proc add_si64*(a: m64, b: m64): m64
-  {.importc: "_mm_add_si64", header: "emmintrin.h".}
-  ## Exposes _mm_add_si64 intrinsics
-
 proc add_epi64*(a: m128i, b: m128i): m128i
   {.importc: "_mm_add_epi64", header: "emmintrin.h".}
   ## Exposes _mm_add_epi64 intrinsics
@@ -445,10 +432,6 @@ proc mullo_epi16*(a: m128i, b: m128i): m128i
   {.importc: "_mm_mullo_epi16", header: "emmintrin.h".}
   ## Exposes _mm_mullo_epi16 intrinsics
 
-proc mul_su32*(a: m64, b: m64): m64
-  {.importc: "_mm_mul_su32", header: "emmintrin.h".}
-  ## Exposes _mm_mul_su32 intrinsics
-
 proc mul_epu32*(a: m128i, b: m128i): m128i
   {.importc: "_mm_mul_epu32", header: "emmintrin.h".}
   ## Exposes _mm_mul_epu32 intrinsics
@@ -468,10 +451,6 @@ proc sub_epi16*(a: m128i, b: m128i): m128i
 proc sub_epi32*(a: m128i, b: m128i): m128i
   {.importc: "_mm_sub_epi32", header: "emmintrin.h".}
   ## Exposes _mm_sub_epi32 intrinsics
-
-proc sub_si64*(a: m64, b: m64): m64
-  {.importc: "_mm_sub_si64", header: "emmintrin.h".}
-  ## Exposes _mm_sub_si64 intrinsics
 
 proc sub_epi64*(a: m128i, b: m128i): m128i
   {.importc: "_mm_sub_epi64", header: "emmintrin.h".}
@@ -618,6 +597,10 @@ when defined(x86_64):
     {.importc: "_mm_cvtsi64_si128", header: "emmintrin.h".}
     ## Exposes _mm_cvtsi64_si128 intrinsics
 
+  proc stream_si64*(p: ptr int64, a: int64): void
+    {.importc: "_mm_stream_si64", header: "emmintrin.h".}
+    ## Exposes _mm_stream_si64 intrinsics
+
 proc cvtepi32_ps*(a: m128i): m128
   {.importc: "_mm_cvtepi32_ps", header: "emmintrin.h".}
   ## Exposes _mm_cvtepi32_ps intrinsics
@@ -650,14 +633,6 @@ proc loadl_epi64*(p: ptr m128i): m128i
   {.importc: "_mm_loadl_epi64", header: "emmintrin.h".}
   ## Exposes _mm_loadl_epi64 intrinsics
 
-proc set_epi64x*(q1: int64, q0: int64): m128i
-  {.importc: "_mm_set_epi64x", header: "emmintrin.h".}
-  ## Exposes _mm_set_epi64x intrinsics
-
-proc set_epi64*(q1: m64, q0: m64): m128i
-  {.importc: "_mm_set_epi64", header: "emmintrin.h".}
-  ## Exposes _mm_set_epi64 intrinsics
-
 proc set_epi32*(i3: int32, i2: int32, i1: int32, i0: int32): m128i
   {.importc: "_mm_set_epi32", header: "emmintrin.h".}
   ## Exposes _mm_set_epi32 intrinsics
@@ -670,14 +645,6 @@ proc set_epi8*(b15: int8, b14: int8, b13: int8, b12: int8, b11: int8, b10: int8,
   {.importc: "_mm_set_epi8", header: "emmintrin.h".}
   ## Exposes _mm_set_epi8 intrinsics
 
-proc set1_epi64x*(q: int64): m128i
-  {.importc: "_mm_set1_epi64x", header: "emmintrin.h".}
-  ## Exposes _mm_set1_epi64x intrinsics
-
-proc set1_epi64*(q: m64): m128i
-  {.importc: "_mm_set1_epi64", header: "emmintrin.h".}
-  ## Exposes _mm_set1_epi64 intrinsics
-
 proc set1_epi32*(i: int32): m128i
   {.importc: "_mm_set1_epi32", header: "emmintrin.h".}
   ## Exposes _mm_set1_epi32 intrinsics
@@ -689,10 +656,6 @@ proc set1_epi16*(w: int16): m128i
 proc set1_epi8*(b: int8): m128i
   {.importc: "_mm_set1_epi8", header: "emmintrin.h".}
   ## Exposes _mm_set1_epi8 intrinsics
-
-proc setr_epi64*(q0: m64, q1: m64): m128i
-  {.importc: "_mm_setr_epi64", header: "emmintrin.h".}
-  ## Exposes _mm_setr_epi64 intrinsics
 
 proc setr_epi32*(i0: int32, i1: int32, i2: int32, i3: int32): m128i
   {.importc: "_mm_setr_epi32", header: "emmintrin.h".}
@@ -737,10 +700,6 @@ proc stream_si128*(p: ptr m128i, a: m128i): void
 proc stream_si32*(p: ptr int32, a: int32): void
   {.importc: "_mm_stream_si32", header: "emmintrin.h".}
   ## Exposes _mm_stream_si32 intrinsics
-
-proc stream_si64*(p: ptr int64, a: int64): void
-  {.importc: "_mm_stream_si64", header: "emmintrin.h".}
-  ## Exposes _mm_stream_si64 intrinsics
 
 proc clflush*(p: ptr int8): void
   {.importc: "_mm_clflush", header: "emmintrin.h".}
@@ -810,14 +769,6 @@ proc unpacklo_epi64*(a: m128i, b: m128i): m128i
   {.importc: "_mm_unpacklo_epi64", header: "emmintrin.h".}
   ## Exposes _mm_unpacklo_epi64 intrinsics
 
-proc movepi64_pi64*(a: m128i): m64
-  {.importc: "_mm_movepi64_pi64", header: "emmintrin.h".}
-  ## Exposes _mm_movepi64_pi64 intrinsics
-
-proc movpi64_epi64*(a: m64): m128i
-  {.importc: "_mm_movpi64_epi64", header: "emmintrin.h".}
-  ## Exposes _mm_movpi64_epi64 intrinsics
-
 proc move_epi64*(a: m128i): m128i
   {.importc: "_mm_move_epi64", header: "emmintrin.h".}
   ## Exposes _mm_move_epi64 intrinsics
@@ -886,13 +837,57 @@ proc shuffle_pd*(a: m128d, b: m128d, c: int32): m128d
   {.importc: "_mm_shuffle_pd", header: "emmintrin.h".}
   ## Exposes _mm_shuffle_pd intrinsics
 
+when not vcc64Bits:
+  proc cvtpd_pi32*(a: m128d): m64
+    {.importc: "_mm_cvtpd_pi32", header: "emmintrin.h".}
+    ## Exposes _mm_cvtpd_pi32 intrinsics
+
+  proc cvttpd_pi32*(a: m128d): m64
+    {.importc: "_mm_cvttpd_pi32", header: "emmintrin.h".}
+    ## Exposes _mm_cvttpd_pi32 intrinsics
+
+  proc cvtpi32_pd*(a: m64): m128d
+    {.importc: "_mm_cvtpi32_pd", header: "emmintrin.h".}
+    ## Exposes _mm_cvtpi32_pd intrinsics
+
+  proc add_si64*(a: m64, b: m64): m64
+    {.importc: "_mm_add_si64", header: "emmintrin.h".}
+    ## Exposes _mm_add_si64 intrinsics
+
+  proc set_epi64*(q1: m64, q0: m64): m128i
+    {.importc: "_mm_set_epi64", header: "emmintrin.h".}
+    ## Exposes _mm_set_epi64 intrinsics
+
+  proc mul_su32*(a: m64, b: m64): m64
+    {.importc: "_mm_mul_su32", header: "emmintrin.h".}
+    ## Exposes _mm_mul_su32 intrinsics
+
+  proc sub_si64*(a: m64, b: m64): m64
+    {.importc: "_mm_sub_si64", header: "emmintrin.h".}
+    ## Exposes _mm_sub_si64 intrinsics
+
+  proc set1_epi64*(q: m64): m128i
+    {.importc: "_mm_set1_epi64", header: "emmintrin.h".}
+    ## Exposes _mm_set1_epi64 intrinsics
+
+  proc setr_epi64*(q0: m64, q1: m64): m128i
+    {.importc: "_mm_setr_epi64", header: "emmintrin.h".}
+    ## Exposes _mm_setr_epi64 intrinsics
+
+  proc movepi64_pi64*(a: m128i): m64
+    {.importc: "_mm_movepi64_pi64", header: "emmintrin.h".}
+    ## Exposes _mm_movepi64_pi64 intrinsics
+
+  proc movpi64_epi64*(a: m64): m128i
+    {.importc: "_mm_movpi64_epi64", header: "emmintrin.h".}
+    ## Exposes _mm_movpi64_epi64 intrinsics
+
 # Assert we generate proper C code
 when isMainModule:
   var myint32 : int32 = 2;
   var mym128 = set1_ps(1.0)
   var mym128i = setr_epi32(1,2,3,4)
   var mym128d = set1_pd(1.0)
-  var mym64 = set1_pi32(1)
   var myfloat64 : float64 = 1.0
   var argint8 : int8 = 1;
   var argint16 : int16 = 2;
@@ -900,13 +895,26 @@ when isMainModule:
   var argm128 = set1_ps(1.0)
   var argm128i = setr_epi32(1,2,3,4)
   var argm128d = set1_pd(1.0)
-  var argm64 = set1_pi32(1)
   var argfloat64 : float64 = 1.0
   var argptrint8 = addr(argint8)
   var argptrint32 : ptr int32 = cast[ptr int32](addr(argm128i))
   var argptrint64 : ptr int64 = cast[ptr int64](addr(argm128i))
   var argptrfloat64 : ptr float64 = cast[ptr float64](addr(argm128d))
   var argptrm128i : ptr m128i = addr(argm128i)
+  when not vcc64Bits:
+    var mym64 = set1_pi32(1)
+    var argm64 = set1_pi32(1)
+    mym64 = mul_su32(argm64, argm64)
+    mym64 = add_si64(argm64, argm64)
+    mym64 = cvtpd_pi32(argm128d)
+    mym64 = cvttpd_pi32(argm128d)
+    mym128d = cvtpi32_pd(argm64)
+    mym64 = sub_si64(argm64, argm64)
+    mym128i = set_epi64(argm64, argm64)
+    mym128i = set1_epi64(argm64)
+    mym128i = setr_epi64(argm64, argm64)
+    mym64 = movepi64_pi64(argm128i)
+    mym128i = movpi64_epi64(argm64)
   mym128d = add_sd(argm128d, argm128d)
   mym128d = add_pd(argm128d, argm128d)
   mym128d = sub_sd(argm128d, argm128d)
@@ -971,9 +979,6 @@ when isMainModule:
   mym128d = cvtss_sd(argm128d, argm128)
   mym128i = cvttpd_epi32(argm128d)
   myint32 = cvttsd_si32(argm128d)
-  mym64 = cvtpd_pi32(argm128d)
-  mym64 = cvttpd_pi32(argm128d)
-  mym128d = cvtpi32_pd(argm64)
   myfloat64 = cvtsd_f64(argm128d)
   mym128d = load_pd(argptrfloat64)
   mym128d = load1_pd(argptrfloat64)
@@ -998,7 +1003,6 @@ when isMainModule:
   mym128i = add_epi8(argm128i, argm128i)
   mym128i = add_epi16(argm128i, argm128i)
   mym128i = add_epi32(argm128i, argm128i)
-  mym64 = add_si64(argm64, argm64)
   mym128i = add_epi64(argm128i, argm128i)
   mym128i = adds_epi8(argm128i, argm128i)
   mym128i = adds_epi16(argm128i, argm128i)
@@ -1014,13 +1018,11 @@ when isMainModule:
   mym128i = mulhi_epi16(argm128i, argm128i)
   mym128i = mulhi_epu16(argm128i, argm128i)
   mym128i = mullo_epi16(argm128i, argm128i)
-  mym64 = mul_su32(argm64, argm64)
   mym128i = mul_epu32(argm128i, argm128i)
   mym128i = sad_epu8(argm128i, argm128i)
   mym128i = sub_epi8(argm128i, argm128i)
   mym128i = sub_epi16(argm128i, argm128i)
   mym128i = sub_epi32(argm128i, argm128i)
-  mym64 = sub_si64(argm64, argm64)
   mym128i = sub_epi64(argm128i, argm128i)
   mym128i = subs_epi8(argm128i, argm128i)
   mym128i = subs_epi16(argm128i, argm128i)
@@ -1066,17 +1068,14 @@ when isMainModule:
   mym128i = load_si128(argptrm128i)
   mym128i = loadu_si128(argptrm128i)
   mym128i = loadl_epi64(argptrm128i)
-  mym128i = set_epi64x(argint64, argint64)
-  mym128i = set_epi64(argm64, argm64)
+  when defined(x86_64):
+    stream_si64(argptrint64, argint64)
   mym128i = set_epi32(1, 1, 1, 1)
   mym128i = set_epi16(argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16)
   mym128i = set_epi8(argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8)
-  mym128i = set1_epi64x(argint64)
-  mym128i = set1_epi64(argm64)
   mym128i = set1_epi32(1)
   mym128i = set1_epi16(argint16)
   mym128i = set1_epi8(argint8)
-  mym128i = setr_epi64(argm64, argm64)
   mym128i = setr_epi32(1, 1, 1, 1)
   mym128i = setr_epi16(argint16, argint16, argint16, argint16, argint16, argint16, argint16, argint16)
   mym128i = setr_epi8(argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8, argint8)
@@ -1088,7 +1087,6 @@ when isMainModule:
   stream_pd(argptrfloat64, argm128d)
   stream_si128(argptrm128i, argm128i)
   stream_si32(argptrint32, 1)
-  stream_si64(argptrint64, argint64)
   clflush(argptrint8)
   lfence()
   mfence()
@@ -1106,8 +1104,6 @@ when isMainModule:
   mym128i = unpacklo_epi16(argm128i, argm128i)
   mym128i = unpacklo_epi32(argm128i, argm128i)
   mym128i = unpacklo_epi64(argm128i, argm128i)
-  mym64 = movepi64_pi64(argm128i)
-  mym128i = movpi64_epi64(argm64)
   mym128i = move_epi64(argm128i)
   mym128d = unpackhi_pd(argm128d, argm128d)
   mym128d = unpacklo_pd(argm128d, argm128d)
